@@ -26,6 +26,7 @@ import alizinha.c4q.nyc.visualizingdatadotgov.models.NycLeadingCausesDeath;
  * Created by c4q-Allison on 7/15/15.
  */
 public class NycDeathCauseLoadTask extends AsyncTask<Void, Void, NycLeadingCausesDeath>{
+    public static final String NYC_LEADING_CAUSE_DEATH_DATA_READY = "nycLeadingCauseDeathDataReady";
 
     private Context mContext;
     private NycLeadingCausesDeath nycLeadingCausesDeath;
@@ -118,7 +119,7 @@ public class NycDeathCauseLoadTask extends AsyncTask<Void, Void, NycLeadingCause
     @Override
     protected void onPostExecute(NycLeadingCausesDeath nycLeadingCausesDeath) { //receiving the nycLeadingCausesDeath result in the main (UI) thread
         this.nycLeadingCausesDeath = nycLeadingCausesDeath;
-        Intent intent = new Intent("trendingDataReady"); //creating the Broadcast Message with "trendingDataReady"
+        Intent intent = new Intent(NYC_LEADING_CAUSE_DEATH_DATA_READY); //creating the Broadcast Message with
         if (mContext != null) {
 
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent); //doing the actual broadcast--Local Broadcast Manager will both do the broadcast and receive it
