@@ -1,6 +1,9 @@
 package alizinha.c4q.nyc.visualizingdatadotgov.asyncTasks;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.content.LocalBroadcastManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,7 +13,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -24,6 +26,18 @@ import alizinha.c4q.nyc.visualizingdatadotgov.models.NycLeadingCausesDeath;
  * Created by c4q-Allison on 7/15/15.
  */
 public class NycDeathCauseLoadTask extends AsyncTask<Void, Void, NycLeadingCausesDeath>{
+
+    private Context mContext;
+    private NycLeadingCausesDeath nycLeadingCausesDeath;
+
+    public NycDeathCauseLoadTask (Context context) {
+        mContext = context;
+    }
+
+    public NycLeadingCausesDeath getNycLeadingCausesDeath() {
+        return this.nycLeadingCausesDeath; // don't need "this" keyword but you can use it here
+    }
+
     @Override
     protected NycLeadingCausesDeath doInBackground(Void... params) {
         NycLeadingCausesDeath nycLeadingCausesDeath = new NycLeadingCausesDeath();
@@ -97,6 +111,18 @@ public class NycDeathCauseLoadTask extends AsyncTask<Void, Void, NycLeadingCause
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return nycLeadingCausesDeath;
+        return nycLeadingCausesDeath; //returns the result from background thread
     }
+
+    //TODO: need onPostExecute method
+    @Override
+    protected void onPostExecute(NycLeadingCausesDeath nycLeadingCausesDeath) { //receiving the nycLeadingCausesDeath result in the main (UI) thread
+        this.nycLeadingCausesDeath = nycLeadingCausesDeath;
+        Intent intent = new Intent("trendingDataReady"); //creating the Broadcast Message with "trendingDataReady"
+        if (mContext != null) {
+
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent); //doing the actual broadcast--Local Broadcast Manager will both do the broadcast and receive it
+        }
+    }
+
 }
