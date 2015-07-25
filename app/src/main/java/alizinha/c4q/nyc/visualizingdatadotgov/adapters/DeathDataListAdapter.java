@@ -35,8 +35,8 @@ import alizinha.c4q.nyc.visualizingdatadotgov.models.DeathData;
     public void onBindViewHolder(DeathRowViewHolder holder, int position) {
         DeathData rowData = deathDataList.get(position);
         holder.deathCauseTV.setText(rowData.getCause());
-        holder.deathCountTV.setText(rowData.getDeathCount());
-        holder.deathPercentTV.setText(rowData.getDeathPercent());
+        holder.deathCountTV.setText(rowData.getDeathCount() + "");
+        holder.deathPercentTV.setText(rowData.getDeathPercent() + "%");
 
     }
 
