@@ -3,4 +3,9 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="ethnicity_label">Ethnicity</string>
+    <string name="year_label">Year</string>
+    <string name="male_label">Male</string>
+    <string name="female_label">Female</string>
+    <string name="show_data_label">Go</string>
 </resources>

@@ -115,7 +115,6 @@ public class NycDeathCauseLoadTask extends AsyncTask<Void, Void, NycLeadingCause
         return nycLeadingCausesDeath; //returns the result from background thread
     }
 
-    //TODO: need onPostExecute method
     @Override
     protected void onPostExecute(NycLeadingCausesDeath nycLeadingCausesDeath) { //receiving the nycLeadingCausesDeath result in the main (UI) thread
         this.nycLeadingCausesDeath = nycLeadingCausesDeath;
