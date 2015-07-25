@@ -9,7 +9,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/selection_criteria"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,12 +19,25 @@
             android:id="@+id/ethnicity_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
             android:prompt="@string/ethnicity_label" />
+
+        <Spinner
+            android:id="@+id/year_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_alignParentRight="true"
+            android:prompt="@string/year_label" />
 
         <RadioGroup
             android:id="@+id/gender_group"
+            android:layout_marginTop="10dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ethnicity_spinner"
+            android:layout_alignParentLeft="true"
+            android:orientation="horizontal">
 
             <RadioButton
                 android:id="@+id/female"
@@ -42,26 +55,28 @@
 
         </RadioGroup>
 
-        <Spinner
-            android:id="@+id/year_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:prompt="@string/year_label" />
+
 
         <Button
             android:id="@+id/show_data_btn"
+            android:layout_below="@id/year_spinner"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/show_data_label" />
+            android:text="@string/show_data_label"
+            android:visibility="gone"/>
 
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/death_data_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:layout_marginTop="10dp"
+        />
 
 
 </LinearLayout>

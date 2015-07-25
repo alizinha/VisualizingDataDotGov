@@ -13,7 +13,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -28,9 +31,11 @@ public class MainActivity extends ActionBarActivity {
 
     private DeathDataListAdapter deathDataListAdapter;
 
-    Button showDataBtn = null;
-    Spinner yearSpinner = null;
-    Spinner ethnicitySpinner = null;
+    private Button showDataBtn = null;
+    private Spinner yearSpinner = null;
+    private Spinner ethnicitySpinner = null;
+    private RadioGroup genderRadioGroup = null;
+
 
     boolean dataRetrieved = false;
 
@@ -41,6 +46,16 @@ public class MainActivity extends ActionBarActivity {
             nycLeadingCausesDeath = nycDeathCauseLoadTask.getNycLeadingCausesDeath();//saving into my activity's instance property from the Async Task
             Log.d("Receiver", "Received nycLeadingCausesDeath" + nycLeadingCausesDeath.getDeathCauseDataList().size());
             dataRetrieved = true;
+
+            ArrayAdapter<String> yearsAdapter = new ArrayAdapter<String>(MainActivity.this,
+                    android.R.layout.simple_spinner_item,
+                    nycLeadingCausesDeath.getUniqueYearsForData());
+            yearSpinner.setAdapter(yearsAdapter);
+
+            ArrayAdapter<String> ethnicitiesAdapter = new ArrayAdapter<String>(MainActivity.this,
+                    android.R.layout.simple_spinner_item,
+                    nycLeadingCausesDeath.getUniqueEthnicities());
+            ethnicitySpinner.setAdapter(ethnicitiesAdapter);
         }
     };
 
@@ -53,6 +68,7 @@ public class MainActivity extends ActionBarActivity {
         showDataBtn = (Button) findViewById(R.id.show_data_btn);
         yearSpinner = (Spinner) findViewById(R.id.year_spinner);
         ethnicitySpinner = (Spinner) findViewById(R.id.ethnicity_spinner);
+        genderRadioGroup = (RadioGroup) findViewById(R.id.gender_group);
 
         RecyclerView rvDeathRowData = (RecyclerView) findViewById(R.id.death_data_list);
         rvDeathRowData.setHasFixedSize(true);
@@ -62,15 +78,43 @@ public class MainActivity extends ActionBarActivity {
         deathDataListAdapter = new DeathDataListAdapter();
         rvDeathRowData.setAdapter(deathDataListAdapter);
 
+        yearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                showFilteredData();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        ethnicitySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                showFilteredData();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        genderRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                showFilteredData();
+            }
+        });
+
         showDataBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (dataRetrieved) {
-                    //(1) load the data into Adapter
-                    deathDataListAdapter.setDeathdataList(nycLeadingCausesDeath.getFilteredDeathData("2010", "NON-HISPANIC WHITE", "FEMALE"));
+                    showFilteredData();
 
-                    //(2) call Adapter's notifyDataChanged() method
-                    deathDataListAdapter.notifyDataSetChanged();
                 }
                 else {
 
@@ -88,6 +132,22 @@ public class MainActivity extends ActionBarActivity {
         //this is what fires off the Async Task. when it finishes executing it's broadcasting the local intent
         nycDeathCauseLoadTask = new NycDeathCauseLoadTask(this);
         nycDeathCauseLoadTask.execute();
+    }
+
+    private void showFilteredData() {
+        //(1) load the data into Adapter
+        String gender;
+        if (genderRadioGroup.getCheckedRadioButtonId() == R.id.male) {
+            gender = "MALE";
+        }
+        else {gender = "FEMALE";}
+
+        deathDataListAdapter.setDeathdataList
+                (nycLeadingCausesDeath.getFilteredDeathData(yearSpinner.getSelectedItem().toString(),
+                        ethnicitySpinner.getSelectedItem().toString(), gender));
+
+        //(2) call Adapter's notifyDataChanged() method
+        deathDataListAdapter.notifyDataSetChanged();
     }
 
 

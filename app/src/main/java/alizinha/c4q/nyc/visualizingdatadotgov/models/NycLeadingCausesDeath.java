@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by c4q-Allison on 7/15/15.
@@ -43,7 +44,7 @@ public class NycLeadingCausesDeath {
     }
 
     public List<String> getUniqueYearsForData() {
-        Set<String> uniqueYears = new HashSet<>();
+        Set<String> uniqueYears = new TreeSet<>();
 
         for (DeathData deathData : deathCauseDataList) {
             String year = deathData.getYear();
@@ -58,7 +59,7 @@ public class NycLeadingCausesDeath {
 
 
     public List<String> getUniqueEthnicities() {
-        Set<String> uniqueEthnicities = new HashSet<>();
+        Set<String> uniqueEthnicities = new TreeSet<>();
 
         for (DeathData deathData : deathCauseDataList) {
             String ethnicity = deathData.getEthnicity();
