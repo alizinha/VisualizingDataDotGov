@@ -8,4 +8,6 @@
     <string name="male_label">Male</string>
     <string name="female_label">Female</string>
     <string name="show_data_label">Go</string>
+    <string name="notificationTitle">VisualizingDataDotGov App</string>
+    <string name="notificationMessage">Good morning! Time to check new death data!</string>
 </resources>
