@@ -1,5 +1,7 @@
 package alizinha.c4q.nyc.visualizingdatadotgov.ui;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -20,10 +22,13 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.util.Calendar;
+
 import alizinha.c4q.nyc.visualizingdatadotgov.R;
 import alizinha.c4q.nyc.visualizingdatadotgov.adapters.DeathDataListAdapter;
 import alizinha.c4q.nyc.visualizingdatadotgov.asyncTasks.NycDeathCauseLoadTask;
 import alizinha.c4q.nyc.visualizingdatadotgov.models.NycLeadingCausesDeath;
+import alizinha.c4q.nyc.visualizingdatadotgov.receivers.AlarmReceiver;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -37,6 +42,8 @@ public class MainActivity extends ActionBarActivity {
     private Spinner ethnicitySpinner = null;
     private RadioGroup genderRadioGroup = null;
 
+    private AlarmManager alarmMgr;
+    private PendingIntent alarmIntent;
 
     boolean dataRetrieved = false;
 
@@ -119,7 +126,7 @@ public class MainActivity extends ActionBarActivity {
                 }
                 else {
 
-                    Toast.makeText(MainActivity.this, "Data not retreived yet. Please retry", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Data not retrieved yet. Please retry", Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -128,6 +135,21 @@ public class MainActivity extends ActionBarActivity {
         //set up listener for local broadcast sent by the AsyncTask below (that is: nycDeathCauseLoadTask)
         LocalBroadcastManager.getInstance(this).registerReceiver(nycDataBroadcast,
                 new IntentFilter(NycDeathCauseLoadTask.NYC_LEADING_CAUSE_DEATH_DATA_READY));
+
+        alarmMgr = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 9);
+
+//        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+//                AlarmManager.INTERVAL_DAY, alarmIntent);
+
+        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                1000 * 10, alarmIntent);
+
 
 
         //this is what fires off the Async Task. when it finishes executing it's broadcasting the local intent
@@ -173,4 +195,6 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
 }
