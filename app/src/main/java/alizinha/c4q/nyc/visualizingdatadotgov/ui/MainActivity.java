@@ -1,4 +1,4 @@
-package alizinha.c4q.nyc.visualizingdatadotgov;
+package alizinha.c4q.nyc.visualizingdatadotgov.ui;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,6 +20,7 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import alizinha.c4q.nyc.visualizingdatadotgov.R;
 import alizinha.c4q.nyc.visualizingdatadotgov.adapters.DeathDataListAdapter;
 import alizinha.c4q.nyc.visualizingdatadotgov.asyncTasks.NycDeathCauseLoadTask;
 import alizinha.c4q.nyc.visualizingdatadotgov.models.NycLeadingCausesDeath;
