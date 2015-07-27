@@ -22,16 +22,29 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Calendar;
 
 import alizinha.c4q.nyc.visualizingdatadotgov.R;
 import alizinha.c4q.nyc.visualizingdatadotgov.adapters.DeathDataListAdapter;
+import alizinha.c4q.nyc.visualizingdatadotgov.api.DataDotGovApi;
+import alizinha.c4q.nyc.visualizingdatadotgov.api.helpers.FeedToModelTransformer;
+import alizinha.c4q.nyc.visualizingdatadotgov.api.models.DeathDataFeed;
 import alizinha.c4q.nyc.visualizingdatadotgov.asyncTasks.NycDeathCauseLoadTask;
 import alizinha.c4q.nyc.visualizingdatadotgov.models.NycLeadingCausesDeath;
 import alizinha.c4q.nyc.visualizingdatadotgov.receivers.AlarmReceiver;
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 
 public class MainActivity extends ActionBarActivity {
+    private static final String DATAGOV_API = "https://data.cityofnewyork.us/api";
     private NycDeathCauseLoadTask nycDeathCauseLoadTask;
     private NycLeadingCausesDeath nycLeadingCausesDeath;
 
@@ -55,17 +68,21 @@ public class MainActivity extends ActionBarActivity {
             Log.d("Receiver", "Received nycLeadingCausesDeath" + nycLeadingCausesDeath.getDeathCauseDataList().size());
             dataRetrieved = true;
 
-            ArrayAdapter<String> yearsAdapter = new ArrayAdapter<String>(MainActivity.this,
-                    android.R.layout.simple_spinner_item,
-                    nycLeadingCausesDeath.getUniqueYearsForData());
-            yearSpinner.setAdapter(yearsAdapter);
-
-            ArrayAdapter<String> ethnicitiesAdapter = new ArrayAdapter<String>(MainActivity.this,
-                    android.R.layout.simple_spinner_item,
-                    nycLeadingCausesDeath.getUniqueEthnicities());
-            ethnicitySpinner.setAdapter(ethnicitiesAdapter);
+            loadSpinnerData();
         }
     };
+
+    private void loadSpinnerData() {
+        ArrayAdapter<String> yearsAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item,
+                nycLeadingCausesDeath.getUniqueYearsForData());
+        yearSpinner.setAdapter(yearsAdapter);
+
+        ArrayAdapter<String> ethnicitiesAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item,
+                nycLeadingCausesDeath.getUniqueEthnicities());
+        ethnicitySpinner.setAdapter(ethnicitiesAdapter);
+    }
 
 
     @Override
@@ -144,8 +161,9 @@ public class MainActivity extends ActionBarActivity {
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.HOUR_OF_DAY, 9);
 
-        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY, alarmIntent);
+//        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+//                AlarmManager.INTERVAL_DAY, alarmIntent);
+
 
 //        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
 //                1000 * 60 * 10, alarmIntent);
@@ -153,9 +171,17 @@ public class MainActivity extends ActionBarActivity {
 
 
         //this is what fires off the Async Task. when it finishes executing it's broadcasting the local intent
-        nycDeathCauseLoadTask = new NycDeathCauseLoadTask(this);
-        nycDeathCauseLoadTask.execute();
+//        nycDeathCauseLoadTask = new NycDeathCauseLoadTask(this);
+//        nycDeathCauseLoadTask.execute();
+//        parseTestFeedJson();
+
+        RestAdapter restAdapter = new RestAdapter.Builder()
+        .setEndpoint(DATAGOV_API)
+                .build();
+        DataDotGovApi dataDotGovApiService = restAdapter.create(DataDotGovApi.class);
+        dataDotGovApiService.getDeathCausesData(new DeathDataLoadCallback());
     }
+
 
     private void showFilteredData() {
         //(1) load the data into Adapter
@@ -194,6 +220,40 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void parseTestFeedJson() {
+        Gson gson =
+                new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+        try {
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    getResources().openRawResource(R.raw.sample_data)));
+
+            //convert the json string back to object
+            DeathDataFeed obj = gson.fromJson(br, DeathDataFeed.class);
+
+            System.out.println(obj);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public class DeathDataLoadCallback implements Callback<DeathDataFeed> {
+
+        @Override
+        public void success(DeathDataFeed deathDataFeed, Response response) {
+            nycLeadingCausesDeath = FeedToModelTransformer.transformFeed(deathDataFeed);
+            if (nycLeadingCausesDeath != null) {
+                dataRetrieved = true;
+                loadSpinnerData();
+            }
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+
+        }
     }
 
 
